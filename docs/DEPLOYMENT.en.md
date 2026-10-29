@@ -10,6 +10,21 @@ The Compose file uses `.env.docker.example` as a template; Compose reads `.env` 
 
 Set a strong database password before exposing or using the stack. PostgreSQL and Redis ports bind to `127.0.0.1` unless deliberately changed. Put TLS and remote access controls in a trusted reverse proxy; do not expose the development database or Redis publicly.
 
+Variables in the Docker template:
+
+| Variable | Purpose |
+|---|---|
+| `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | PostgreSQL bootstrap account; never commit the password |
+| `COMPOSE_PROJECT_NAME` | Compose project identity; use a distinct name for each instance |
+| `WEB_PORT` | Host HTTP port for the Frontend |
+| `POSTGRES_HOST_PORT` / `REDIS_HOST_PORT` | Diagnostic ports bound to loopback |
+| `INSIGHTHUB_CREDENTIALS_MASTER_KEY` | Optional vault master key; Backend and Worker must share it |
+| `GENERIC_EMBEDDING_BASE_URL` / `GENERIC_EMBEDDING_MODEL` / `GENERIC_EMBEDDING_API_KEY` | Optional OpenAI-compatible embedding service; blank disables it |
+| `COVER_AUTO_ENABLED` / `COVER_AUTO_STARTUP_SCAN_ENABLED` | Automatic cover switches; off in the template |
+| `COVER_MONTHLY_BUDGET` | InsightHub local cover-attempt safety cap, not MiniMax's official quota |
+
+See `.env.docker.example` for the complete template. Configure business provider API keys in the encrypted UI vault, not in Compose environment variables.
+
 The container serves the exact release license at `/LICENSE`. Keep the corresponding source snapshot, including build/install/run scripts and lock files, available alongside any image distribution; publish the repository URL in the deployment instructions before operating a modified network-facing release.
 
 ## Paid integrations
@@ -34,6 +49,8 @@ Back up the database consistently with `app_data`; preserving only one may leave
 - `docker compose -f compose.release.yaml logs --tail 200 backend worker`: API and worker logs.
 
 The worker health check requires at least one registered RQ worker. If it stays unhealthy, inspect its logs and confirm `REDIS_URL` and the `insighthub` queue. Do not delete Redis data to recover a worker without first auditing queued jobs.
+
+See the [troubleshooting guide](TROUBLESHOOTING.en.md) for additional non-destructive checks.
 
 ## BGE-M3 boundary
 

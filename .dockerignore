@@ -28,3 +28,6 @@ docs/screenshots/
 *.bin
 *.pt
 *.pth
+
+# Local package caches
+**/.npm-cache*/

@@ -8,6 +8,35 @@ InsightHub 是自托管的研究与学习工作台，用于收集资料、提取
 
 默认容器部署会将 PostgreSQL、Redis、上传文件、导出文件和加密凭据保存在持久化卷中。首次启动后，请在应用内配置 Provider 凭据。本仓库不包含模型 API Key。
 
+以下截图来自隔离 v1.0.0 Docker 部署。示例资料为虚构内容，未配置真实模型凭据。详见[截图来源说明](docs/assets/screenshots/README.md)。
+
+| 收集 | 知识库 | AI 模型设置 |
+|---|---|---|
+| ![包含合成样例的收集页](docs/assets/screenshots/collection-synthetic.png) | ![包含合成样例的知识库](docs/assets/screenshots/library-synthetic.png) | ![显示 Fake Provider 的模型设置](docs/assets/screenshots/settings-models-synthetic.png) |
+
+## 文档导航
+
+| 内容 | 简体中文 | English |
+|---|---|---|
+| Docker Compose 安装 | [安装指南](docs/INSTALL.zh-CN.md) | [Install](docs/INSTALL.en.md) |
+| Windows 本机安装 | [本机安装](docs/INSTALL-LOCAL.zh-CN.md) | [Local install](docs/INSTALL-LOCAL.en.md) |
+| 部署与运维 | [部署说明](docs/DEPLOYMENT.zh-CN.md) | [Deployment](docs/DEPLOYMENT.en.md) |
+| AI Provider 与向量检索 | [模型说明](docs/MODELS.zh-CN.md) | [Models](docs/MODELS.en.md) |
+| 应用使用 | [使用指南](docs/USER-GUIDE.zh-CN.md) | [User guide](docs/USER-GUIDE.en.md) |
+| 故障排查 | [故障排查](docs/TROUBLESHOOTING.zh-CN.md) | [Troubleshooting](docs/TROUBLESHOOTING.en.md) |
+| 系统架构 | [架构说明](docs/ARCHITECTURE.md) | [Architecture](docs/ARCHITECTURE.md#architecture-at-a-glance) |
+| 许可证 | [第三方许可说明](docs/THIRD-PARTY-LICENSES.md) | [Third-party notices](docs/THIRD-PARTY-LICENSES.md) |
+
+### 五分钟首次启动
+
+1. 安装 Docker Engine 和 Compose v2 插件。
+2. 复制 `.env.docker.example` 为 `.env`，设置强随机 `POSTGRES_PASSWORD`，妥善保管该文件。
+3. 执行 `docker compose -f compose.release.yaml up -d --build`。
+4. 等待 `docker compose -f compose.release.yaml ps` 显示服务健康，再打开 `http://localhost:8080`。
+5. 收集一条资料。准备使用模型时，再进入应用配置 Provider；模型密钥保存在应用加密 Vault 中，启动服务不需要 API Key。
+
+“五分钟”针对 Docker 镜像和依赖已缓存的情况，实际时间受网络与硬件影响。首次安装还需下载镜像和依赖，可能更久。Web/API/数据库可在没有 AI 密钥时启动；向量 Embedding 和配图均为可选能力。
+
 ## 功能
 
 - 收集网址、文本和常见文档。

@@ -1,0 +1,13 @@
+flowchart TB
+  Chunks[Source ContentChunks] --> Embed[Optional embedding provider]
+  Embed --> Vector[(Profile-scoped 1024-d vectors)]
+  Chunks --> FTS[(PostgreSQL full-text / trigram)]
+  Query[Search or Ask query] --> Retrieve[Hybrid retrieval]
+  Vector --> Retrieve
+  FTS --> Retrieve
+  Retrieve --> Context[Bounded source snippets with provenance]
+  Context --> Chat[Configured Chat deployment for Ask]
+  Chat --> Citation[Validate citations against retrieved evidence]
+  Citation --> Answer[Persisted Ask response]
+  Analysis[Analysis workflow] --> ChatAnalysis[Configured Chat deployment]
+  ChatAnalysis --> Claims[Validated Claim / Evidence]

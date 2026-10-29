@@ -1,5 +1,73 @@
 # Architecture
 
+## Architecture at a glance
+
+The source-editable Mermaid files are in [`docs/diagrams/`](diagrams/architecture.mmd). Optional provider edges are active only when configured and routed; external models are not bundled.
+
+```mermaid
+flowchart TB
+  Browser[Browser] --> Frontend[React UI served by Nginx]
+  Frontend --> API[FastAPI Backend]
+  API --> Services[Application services]
+  Services --> PG[(PostgreSQL + pgvector)]
+  Services --> Redis[(Redis / RQ)]
+  API --> Files[(Persistent app_data)]
+  Worker[RQ Worker] --> Services
+  Worker --> PG
+  Worker --> Files
+  Services -. configured workflows only .-> Models[External Chat / Embedding / Image providers]
+```
+
+### Source to evidence
+
+```mermaid
+flowchart LR
+  Input[URL / text / upload] --> Source[Persist Source and original bytes]
+  Source --> Extract[ExtractionService]
+  Extract --> Doc[ExtractedDocument + provenance]
+  Doc --> Chunks[ContentChunks]
+  Chunks --> Analysis[AnalysisRun via RQ]
+  Analysis --> Provider[Configured Chat workflow]
+  Provider --> Validate[Parse + schema + evidence validation]
+  Validate --> Result[Persist AnalysisResult, Claims, Evidence]
+  Result --> Library[Knowledge library / Search / Ask / Notes]
+  Source -. optional independent task .-> Cover[Cover generation]
+```
+
+### Models and retrieval
+
+```mermaid
+flowchart TB
+  Chunks[Source ContentChunks] --> Embed[Optional embedding provider]
+  Embed --> Vector[(Profile-scoped 1024-d vectors)]
+  Chunks --> FTS[(PostgreSQL full-text / trigram)]
+  Query[Search or Ask query] --> Retrieve[Hybrid retrieval]
+  Vector --> Retrieve
+  FTS --> Retrieve
+  Retrieve --> Context[Bounded source snippets with provenance]
+  Context --> Chat[Configured Chat deployment for Ask]
+  Chat --> Citation[Validate citations against retrieved evidence]
+  Citation --> Answer[Persisted Ask response]
+  Analysis[Analysis workflow] --> ChatAnalysis[Configured Chat deployment]
+  ChatAnalysis --> Claims[Validated Claim / Evidence]
+```
+
+### Docker deployment
+
+```mermaid
+flowchart LR
+  User[Browser] -->|HTTP WEB_PORT| Nginx[Frontend Nginx]
+  Nginx -->|/api proxy| Backend[FastAPI]
+  Backend -->|enqueue| Redis[(Redis)]
+  Worker[RQ Worker] --> Redis
+  Backend --> PG[(PostgreSQL + pgvector)]
+  Worker --> PG
+  Backend --> AppData[(app_data volume)]
+  Worker --> AppData
+  Backend -. optional configured calls .-> External[Model / Embedding services]
+  Worker -. optional configured calls .-> External
+```
+
 目标运行时：
 
 ```text
