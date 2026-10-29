@@ -2,21 +2,21 @@
 
 ## Status
 
-**QUALIFIED FOR PUBLICATION.** The sole target is the owner-created public repository `https://github.com/sabimonkey/InsightHub`; the intended release page is `https://github.com/sabimonkey/InsightHub/releases/tag/v1.0.0`. This report is part of the sanitized release tree. A fresh single-root commit and tag are finalized only after this report and the final scan are committed. The stale tag in the private snapshot is not included.
+**PUBLISHED.** Repository: `https://github.com/sabimonkey/InsightHub`. Release: `https://github.com/sabimonkey/InsightHub/releases/tag/v1.0.0`. The annotated `v1.0.0` tag points to release commit `6f7b32a41a422c4f842b160c6dd83a8d8c47c8d7`. The later `main` report-only commit records post-publication verification; the release tag is unchanged.
 
 ## Snapshot and ownership review
 
 - Source worktree baseline: `530b031bbf9718fdf311d9b54788f899f82ba0ef` on `main`; pre-existing dirty files were left untouched.
 - Private snapshot baseline: `b04feafb81819aaaff7998dab90240a4c57589be`. Sanitized documentation commits: `83d5047a6e16420ac0a13242da0f599986b236bf`, `716f7d2ada60b8943507d97e8e0e877e859f1037`, and `1ee0a52adce06aaacd24502300ce0e6a4e44f9c2`. The old local `v1.0.0` tag targets `676aaa4033fb015e0bec6904441a2569ae939ac9` and will not be pushed.
 - The release Git tree contains no production database, user application data, screenshots, model weights, or runtime logs. Its single generic commit identity and lack of copyright headers do not independently establish legal ownership; the owner selected AGPL-3.0-only for InsightHub-authored code.
-- The public history is deliberately flattened to a fresh single root commit. The source/private history (which contained fake key-shaped test fixtures) is not reachable from the public branch or tag. The release commit uses a project-level author identity instead of the workstation's personal Git email.
+- The tagged release starts from a fresh root commit. The source/private history (which contained fake key-shaped test fixtures) is not reachable from the public refs. The later `main` commit changes only this release report. Both use a project-level author identity instead of the workstation's personal Git email.
 
 ## License and third-party review
 
 - Replaced root `LICENSE` with the complete, unmodified GNU AGPL v3 text from the official GNU source: <https://ftp.gnu.org/pub/gnu/Licenses/agpl-3.0.txt>.
 - Updated English and Simplified Chinese README and release notes to explain AGPL-3.0-only, permitted use/modification/distribution/commercial use, and relevant license/source obligations.
 - Updated `docs/THIRD-PARTY-LICENSES.md`. PyMuPDF 1.28.2 is pinned and used by PDF extraction/export; PyMuPDF4LLM is absent from the release lock. Third-party packages retain their own terms. This is not a complete SBOM or legal opinion.
-- The frontend image serves the exact license at `/LICENSE`; HTTP smoke check returned 200 and 34,427 bytes. The candidate UI links the exact release source at the supplied public repository's `v1.0.0` tag; the link will resolve after the tag is created.
+- The frontend image serves the exact license at `/LICENSE`; final Docker smoke returned HTTP 200 and 35,012 bytes. The UI links the exact release source at the public repository's `v1.0.0` tag. The remote README files, root LICENSE, and release notes were fetched after publication and verified present.
 - `exporting.py` uses PyMuPDF without setting PDF metadata. A direct PyMuPDF 1.28.2 smoke-generated PDF had empty Producer/Creator/Title metadata; the app export path was inspected, not integration-executed. Official PyMuPDF docs describe these metadata fields but the reviewed docs do not state that generated PDFs must include PyMuPDF producer/copyright metadata. Preserve package notices in the software distribution; do not add an unverified or misleading attribution to user PDFs. This review is not legal advice; obtain Artifex clarification if the output attribution scope remains uncertain. [Exact PyMuPDF 1.28.2 release](https://github.com/pymupdf/PyMuPDF/releases/tag/1.28.2), [licensing page](https://pymupdf.readthedocs.io/en/latest/about.html#license-and-copyright), [metadata docs](https://pymupdf.readthedocs.io/en/latest/document.html#Document.metadata).
 
 ## Secrets and personal-data audit
@@ -27,7 +27,7 @@
 - Remaining heuristic matches were false positives (for example CSS selectors containing `ask-`) or non-secret test/runtime sentinels. No matched values were printed or included in this report.
 - Final working-tree candidate scan covered 984 publishable files: **0 high-confidence secret matches**, **0 non-example email matches**; the only sensitive-path matches were the two `.env` example templates. One generic assignment match is the local browser-runtime probe marker, not a credential.
 - After the sanitized snapshot commit, a fresh text-file scan covered 442 text/config files: **0 key-shaped strings**, **0 private-key headers**, **0 user-profile paths**, **0 non-example emails**. Six credential-pattern assignments were reviewed by path and classified as test placeholders or the local browser probe marker; their values were not printed.
-- A reachable-history object scan covered 1,906 Git objects and found five key-shaped strings in three legacy test files only; they occur in test fixtures/expected Authorization values, not runtime configuration. They no longer appear in the sanitized working tree. The final repository will use a new root commit so these old objects are not pushed.
+- The private snapshot's reachable-history scan found five key-shaped strings in legacy test fixtures only; those values were sanitized in the published tree. A fresh published release history has one root commit, with 1,876 reachable objects / 970 blobs and **zero** high-confidence secret-pattern blobs or sensitive asset paths. The final tracked tree scan covered 988 paths / 730 text files and found **zero** high-confidence secret files, non-example email files, or database/model-weight/screenshot paths. Old private-history objects are not reachable from the public refs.
 - The Docker test stack used synthetic database credentials only, no model keys, and made no paid AI call.
 
 ## BGE-M3
@@ -56,8 +56,10 @@ Docker Engine became available for explicitly approved isolated testing. Existin
 ## GitHub target and publication safety
 
 - GitHub metadata confirms `sabimonkey/InsightHub` is public, owner-controlled, and size 0. The branches endpoint returned `[]`; tag refs returned HTTP 409 `Git Repository is empty`; an elevated `git ls-remote --heads --tags origin` also returned no refs. No unrelated same-name repository was used.
-- The release snapshot is isolated at `.tmp_release_publish_final`, and its sole remote is `https://github.com/sabimonkey/InsightHub.git`. Only the sanitized `main` and `v1.0.0` tag are publication candidates. No force push is planned; the stale private-snapshot tag is excluded.
-- Git Credential Manager reported an already-cached credential without disclosing its value; GitHub operations will use that credential only for the user-authorized push and Release creation. No app-provider API key is used, copied, logged, or published.
+- The release snapshot was isolated at `.tmp_release_publish_final`; its sole remote was `https://github.com/sabimonkey/InsightHub.git`. The target's branches and tags were empty immediately before publication. Only sanitized `main` and `v1.0.0` were pushed; Git reported new refs and no force push was used. The stale private-snapshot tag is not present remotely.
+- Git Credential Manager supplied an already-cached GitHub credential for the user-authorized push and Release creation. Its value was never printed or saved in the release tree. No app-provider API key was used, copied, logged, or published.
+- GitHub REST confirms the annotated `v1.0.0` tag resolves to release commit `6f7b32a41a422c4f842b160c6dd83a8d8c47c8d7`, and the Release is publicly available at the URL above. The tag is unsigned; no signing key was configured or added.
+- GitHub Release creation succeeded, and a follow-up GET confirmed the published, non-draft `v1.0.0` entry. Public REST reads of English/Chinese README, full root LICENSE, and release notes succeeded.
 
 ## AGPL network/interface notice review
 
@@ -68,4 +70,4 @@ Docker Engine became available for explicitly approved isolated testing. Existin
 
 `LICENSE`, English/Chinese README, release notes, third-party notices, bilingual deployment guides, Docker files, seven backend test files with only fake credential substitutions, `frontend/vitest.config.ts`, the AGPL/source UI notice and test, and `.gitattributes` to preserve the Linux entrypoint line ending on Windows checkouts.
 
-The report's target URLs are fixed. The final commit/tag are created after the report and audit are complete. The GitHub Release is a separate publication step after the verified branch and tag push; this qualification report alone does not imply that the remote Release already exists.
+The public release source is the `v1.0.0` tag. A documentation-only follow-up commit on `main` records the created Release URL and post-push verification; it does not move or replace the release tag.
