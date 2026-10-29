@@ -1,0 +1,41 @@
+[project]
+name = "insighthub"
+version = "1.0.0"
+description = "InsightHub personal research and learning intelligence hub"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "sqlalchemy>=2.0",
+    "alembic>=1.14",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "psycopg[binary]>=3.2",
+    "pgvector>=0.3",
+    "httpx>=0.27",
+    "redis>=5.0",
+    "rq>=2.0",
+    "python-multipart>=0.0.9",
+    "pymupdf>=1.24",
+    "python-docx>=1.1",
+    "pillow>=10",
+    "rapidocr-onnxruntime>=1.3",
+    "playwright>=1.49",
+    "cryptography>=43.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]

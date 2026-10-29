@@ -1,0 +1,53 @@
+:root {
+  color-scheme: light;
+  --ih-bg: #f5f5f3;
+  --ih-surface: #ffffff;
+  --ih-surface-muted: #eeeeec;
+  --ih-surface-soft: #e7e7e5;
+  --ih-border: #d7d7d4;
+  --ih-border-soft: #e7e7e4;
+  --ih-text-primary: #171717;
+  --ih-text-secondary: #606060;
+  --ih-text-tertiary: #858585;
+  --ih-accent: #0736fe;
+  --ih-accent-hover: #052ee0;
+  --ih-accent-active: #0427c2;
+  --ih-accent-soft: #edf0ff;
+  --ih-accent-border: #b7c5ff;
+  --ih-ink: #171717;
+  --ih-ink-muted: #2c2c2c;
+  --ih-success-soft: #e8f3ea;
+  --ih-success-text: #285637;
+  --ih-warning-soft: #faf0e4;
+  --ih-warning-text: #7a4b12;
+  --ih-danger-soft: #fce9e7;
+  --ih-danger-text: #8b2e28;
+
+  --shadow-card:
+    0 1px 2px rgba(0, 0, 0, 0.025),
+    0 5px 14px rgba(0, 0, 0, 0.035),
+    0 15px 32px rgba(0, 0, 0, 0.025);
+  --shadow-elevated:
+    0 2px 5px rgba(0, 0, 0, 0.04),
+    0 12px 28px rgba(0, 0, 0, 0.06),
+    0 26px 56px rgba(0, 0, 0, 0.035);
+
+  --radius-card: 24px;
+  --radius-panel: 16px;
+  --radius-control: 10px;
+  --radius-pill: 999px;
+
+  --app-page-max-wide: 1680px;
+  --app-page-max-standard: 1520px;
+  --app-page-max-reading: 1120px;
+  --app-page-gutter-desktop: 32px;
+  --app-page-gutter-tablet: 24px;
+  --app-page-gutter-mobile: 16px;
+  --app-page-top: 32px;
+  --font-page-title: 32px;
+  --font-section-title: 19px;
+  --font-body: 16px;
+  --font-meta: 13px;
+  --font-button: 14px;
+  --line-body: 1.7;
+}

@@ -1,0 +1,130 @@
+name: ${COMPOSE_PROJECT_NAME:-insighthub_release}
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-insighthub}
+      POSTGRES_USER: ${POSTGRES_USER:-insighthub}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env before starting}
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-15434}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "1"]
+    ports:
+      - "127.0.0.1:${REDIS_HOST_PORT:-16380}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-insighthub}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-insighthub}
+      REDIS_URL: redis://redis:6379/0
+      INSIGHTHUB_API_HOST: 0.0.0.0
+      INSIGHTHUB_API_PORT: 8090
+      INSIGHTHUB_SYSTEM_SCOPE: USER
+      COVER_AUTO_ENABLED: ${COVER_AUTO_ENABLED:-false}
+      COVER_AUTO_STARTUP_SCAN_ENABLED: ${COVER_AUTO_STARTUP_SCAN_ENABLED:-false}
+      COVER_MONTHLY_BUDGET: ${COVER_MONTHLY_BUDGET:-100}
+      EXTRACTION_INLINE: "false"
+      ANALYSIS_INLINE: "false"
+      ASK_INLINE: "false"
+      BRIEF_INLINE: "false"
+      COVER_INLINE: "false"
+      GENERIC_EMBEDDING_BASE_URL: ${GENERIC_EMBEDDING_BASE_URL:-}
+      GENERIC_EMBEDDING_MODEL: ${GENERIC_EMBEDDING_MODEL:-}
+      GENERIC_EMBEDDING_API_KEY: ${GENERIC_EMBEDDING_API_KEY:-}
+      INSIGHTHUB_CREDENTIALS_MASTER_KEY: ${INSIGHTHUB_CREDENTIALS_MASTER_KEY:-}
+    volumes:
+      - app_data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8090/ready', timeout=3).read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 45s
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    restart: unless-stopped
+    command: ["worker"]
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-insighthub}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-insighthub}
+      REDIS_URL: redis://redis:6379/0
+      INSIGHTHUB_SYSTEM_SCOPE: USER
+      COVER_AUTO_ENABLED: ${COVER_AUTO_ENABLED:-false}
+      COVER_AUTO_STARTUP_SCAN_ENABLED: "false"
+      COVER_MONTHLY_BUDGET: ${COVER_MONTHLY_BUDGET:-100}
+      EXTRACTION_INLINE: "false"
+      ANALYSIS_INLINE: "false"
+      ASK_INLINE: "false"
+      BRIEF_INLINE: "false"
+      COVER_INLINE: "false"
+      GENERIC_EMBEDDING_BASE_URL: ${GENERIC_EMBEDDING_BASE_URL:-}
+      GENERIC_EMBEDDING_MODEL: ${GENERIC_EMBEDDING_MODEL:-}
+      GENERIC_EMBEDDING_API_KEY: ${GENERIC_EMBEDDING_API_KEY:-}
+      INSIGHTHUB_CREDENTIALS_MASTER_KEY: ${INSIGHTHUB_CREDENTIALS_MASTER_KEY:-}
+    volumes:
+      - app_data:/app/data
+    depends_on:
+      backend:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,sys; from redis import Redis; from rq import Worker; sys.exit(0 if Worker.all(connection=Redis.from_url(os.environ['REDIS_URL'])) else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend.Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+      worker:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:
+  redis_data:
+  app_data:

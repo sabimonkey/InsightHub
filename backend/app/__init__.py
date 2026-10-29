@@ -1,0 +1,1 @@
+"""InsightHub backend application package."""

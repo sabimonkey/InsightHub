@@ -1,0 +1,153 @@
+@import './styles/tokens.css';
+@import './styles/product.css';
+
+body {
+  margin: 0;
+  background: var(--ih-bg);
+  color: var(--ih-text-primary);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-page {
+  max-width: var(--app-page-max-wide);
+  margin: 0 auto;
+  padding: var(--app-page-top) var(--app-page-gutter-desktop) 48px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.app-page--standard {
+  max-width: var(--app-page-max-standard);
+}
+
+.inbox-page.collection-page {
+  max-width: var(--app-page-max-wide);
+}
+
+.collection-split {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.collection-split-left {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.collection-split-right {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.collection-split-divider {
+  flex: 0 0 10px;
+  margin: 0 4px;
+  cursor: col-resize;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  border-radius: 4px;
+  touch-action: none;
+  user-select: none;
+}
+
+.collection-split-divider:hover,
+.collection-split-divider:focus-visible {
+  background: color-mix(in srgb, var(--ih-accent) 8%, transparent);
+  outline: none;
+}
+
+.collection-split-grip {
+  width: 3px;
+  border-radius: 2px;
+  background: #d9d9d9;
+  margin: 8px 0;
+}
+
+.collection-split-divider:hover .collection-split-grip,
+.collection-split-divider:focus-visible .collection-split-grip {
+  background: var(--ih-accent);
+}
+
+.collection-left-pane {
+  min-width: 0;
+}
+
+.collection-left-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.collection-source-list {
+  min-width: 0;
+}
+
+.collection-add-panel {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+body.collection-split-dragging {
+  user-select: none;
+  cursor: col-resize;
+}
+
+@media (max-width: 900px) {
+  .collection-split {
+    flex-direction: column;
+  }
+
+  .collection-split-left,
+  .collection-split-right {
+    flex: 1 1 auto;
+    max-width: none !important;
+    width: 100%;
+  }
+
+  .collection-split-right {
+    order: -1;
+  }
+
+  .collection-split-left {
+    order: 1;
+  }
+
+  .collection-split-divider {
+    display: none;
+  }
+
+  .collection-split-right {
+    position: static;
+    max-height: none;
+  }
+}
+
+.add-row,
+.add-column,
+.inbox-toolbar {
+  display: flex;
+  gap: 12px;
+}
+
+.add-column {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.inbox-toolbar {
+  margin: 8px 0 12px;
+}
+
+.ant-table-row {
+  cursor: pointer;
+}
