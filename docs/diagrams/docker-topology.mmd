@@ -1,0 +1,11 @@
+flowchart LR
+  User[Browser] -->|HTTP WEB_PORT| Nginx[Frontend Nginx]
+  Nginx -->|/api proxy| Backend[FastAPI]
+  Backend -->|enqueue| Redis[(Redis)]
+  Worker[RQ Worker] --> Redis
+  Backend --> PG[(PostgreSQL + pgvector)]
+  Worker --> PG
+  Backend --> AppData[(app_data volume)]
+  Worker --> AppData
+  Backend -. optional configured calls .-> External[Model / Embedding services]
+  Worker -. optional configured calls .-> External

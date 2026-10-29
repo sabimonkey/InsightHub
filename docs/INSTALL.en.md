@@ -17,6 +17,8 @@ This is the recommended single-host deployment. It runs the web application, API
    if (-not (Test-Path .env)) { Copy-Item .env.docker.example .env }
    ```
 
+   On Linux/macOS, use `cp -n .env.docker.example .env`. If `.env` already exists, preserve it and review its values rather than replacing it.
+
 3. Set `POSTGRES_PASSWORD` to a long random value. Use hexadecimal characters so the password can safely appear in the URL assembled by Compose. Keep `.env` private. Optionally set `INSIGHTHUB_CREDENTIALS_MASTER_KEY` before first launch; if omitted, the app creates one in persistent application storage. Back up that storage securely because losing the master key makes encrypted provider credentials unreadable.
 4. Start the stack:
 
@@ -28,6 +30,8 @@ This is the recommended single-host deployment. It runs the web application, API
 5. Wait for the backend readiness check, then open `http://localhost:8080` (or the configured `WEB_PORT`). Configure an AI provider from Settings. No model key is required for initial startup.
 
 The first backend start applies Alembic migrations before starting the API. The worker starts only after the API is ready. Startup cover generation is disabled to prevent an unexpected paid image call. Do not enable optional paid features until their credentials and budgets are reviewed.
+
+A first install downloads container images and dependencies and can take substantially longer than five minutes. For follow-up checks use `docker compose -f compose.release.yaml ps`, `curl http://localhost:8080/health`, and `curl http://localhost:8080/ready`. See the [deployment and operations guide](DEPLOYMENT.en.md) for settings and the [models guide](MODELS.en.md) for optional providers and embeddings.
 
 ## Embeddings
 

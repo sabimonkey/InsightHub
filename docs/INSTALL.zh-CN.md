@@ -17,6 +17,8 @@
    if (-not (Test-Path .env)) { Copy-Item .env.docker.example .env }
    ```
 
+   Linux/macOS 可使用 `cp -n .env.docker.example .env`；若 `.env` 已存在，请保留并检查现有配置，不要覆盖。
+
 3. 将 `POSTGRES_PASSWORD` 改成足够长的随机值。建议只使用十六进制字符，以便安全用于 Compose 生成的数据库连接 URL。保护好 `.env`。可在首次启动前设置 `INSIGHTHUB_CREDENTIALS_MASTER_KEY`；若留空，应用会在持久化目录中生成主密钥。请安全备份应用数据卷，否则丢失主密钥后将无法读取已加密的 Provider 凭据。
 4. 启动服务：
 
@@ -28,6 +30,8 @@
 5. 等待 Backend readiness 检查通过，然后打开 `http://localhost:8080`（或配置的 `WEB_PORT`）。首次启动不需要模型 Key；进入「设置」后再配置 AI Provider。
 
 Backend 首次启动会先应用 Alembic 迁移，再启动 API。Worker 会等 API 就绪后启动。启动时自动生成封面已关闭，避免意外产生付费图片调用。配置和预算核对前，请勿开启付费功能。
+
+首次安装会下载容器镜像和依赖，因此可能远超五分钟。后续检查可使用 `docker compose -f compose.release.yaml ps`、`Invoke-WebRequest http://localhost:8080/health` 和 `Invoke-WebRequest http://localhost:8080/ready`。配置项见[部署与运维](DEPLOYMENT.zh-CN.md)，模型与可选 Embedding 见[模型说明](MODELS.zh-CN.md)。
 
 ## Embedding
 

@@ -1,0 +1,11 @@
+flowchart TB
+  Browser[Browser] --> Frontend[React UI served by Nginx]
+  Frontend --> API[FastAPI Backend]
+  API --> Services[Application services]
+  Services --> PG[(PostgreSQL + pgvector)]
+  Services --> Redis[(Redis / RQ)]
+  API --> Files[(Persistent app_data)]
+  Worker[RQ Worker] --> Services
+  Worker --> PG
+  Worker --> Files
+  Services -. configured workflows only .-> Models[External Chat / Embedding / Image providers]

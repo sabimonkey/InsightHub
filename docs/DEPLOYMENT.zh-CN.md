@@ -10,6 +10,21 @@ Compose 使用 `.env.docker.example` 作为模板，Compose 会自动读取 `.en
 
 在使用服务前设置高强度数据库密码。PostgreSQL 和 Redis 默认绑定 `127.0.0.1`。远程访问应通过可信反向代理配置 TLS 和访问控制；不要将开发数据库或 Redis 暴露到公网。
 
+Docker 模板中的变量：
+
+| 变量 | 用途 |
+|---|---|
+| `POSTGRES_DB` / `POSTGRES_USER` / `POSTGRES_PASSWORD` | PostgreSQL 初始化账户；密码不得提交 |
+| `COMPOSE_PROJECT_NAME` | Compose 项目标识，多个实例应使用不同名称 |
+| `WEB_PORT` | Frontend 对主机开放的 HTTP 端口 |
+| `POSTGRES_HOST_PORT` / `REDIS_HOST_PORT` | 绑定到回环地址的诊断端口 |
+| `INSIGHTHUB_CREDENTIALS_MASTER_KEY` | 可选 Vault 主密钥；Backend/Worker 必须一致 |
+| `GENERIC_EMBEDDING_BASE_URL` / `GENERIC_EMBEDDING_MODEL` / `GENERIC_EMBEDDING_API_KEY` | 可选 OpenAI 兼容向量服务；留空禁用 |
+| `COVER_AUTO_ENABLED` / `COVER_AUTO_STARTUP_SCAN_ENABLED` | 自动封面开关；模板中默认关闭 |
+| `COVER_MONTHLY_BUDGET` | InsightHub 本地封面尝试安全上限，不是 MiniMax 官方额度 |
+
+完整配置示例见根目录 `.env.docker.example`。业务 Provider API Key 应在 UI 的加密 Vault 配置，不应放入 Compose 环境。
+
 容器会在 `/LICENSE` 提供当前发布版本的许可证原文。分发镜像时，应同时提供对应版本的完整源代码快照，包括构建、安装、运行脚本和锁定依赖文件；在运行修改后的网络服务前，应在部署说明中提供该版本的公开源码地址。
 
 ## 付费集成
@@ -34,6 +49,8 @@ Compose 使用 `.env.docker.example` 作为模板，Compose 会自动读取 `.en
 - `docker compose -f compose.release.yaml logs --tail 200 backend worker`：API 与 Worker 日志。
 
 Worker 健康检查要求至少有一个已注册的 RQ Worker。若持续不健康，请检查日志、`REDIS_URL` 和 `insighthub` 队列。排查前不要直接删除 Redis 数据，应先审计排队任务。
+
+更多无损检查步骤见[故障排查](TROUBLESHOOTING.zh-CN.md)。
 
 ## BGE-M3 边界
 

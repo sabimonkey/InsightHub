@@ -1,0 +1,11 @@
+flowchart LR
+  Input[URL / text / upload] --> Source[Persist Source and original bytes]
+  Source --> Extract[ExtractionService]
+  Extract --> Doc[ExtractedDocument + provenance]
+  Doc --> Chunks[ContentChunks]
+  Chunks --> Analysis[AnalysisRun via RQ]
+  Analysis --> Provider[Configured Chat workflow]
+  Provider --> Validate[Parse + schema + evidence validation]
+  Validate --> Result[Persist AnalysisResult, Claims, Evidence]
+  Result --> Library[Knowledge library / Search / Ask / Notes]
+  Source -. optional independent task .-> Cover[Cover generation]
